@@ -57,9 +57,11 @@ contract StakingRewards is ReentrancyGuard {
 
   function stake(uint _amount) external nonReentrant updateReward(msg.sender) {
     require(_amount > 0, "Stake amount should be positive");
+
     _totalSupply += _amount;
     _balances[msg.sender] += _amount;
     stakingToken.transferFrom(msg.sender, address(this), _amount);
+
     emit Staked(msg.sender, _amount);
   }
 
@@ -67,20 +69,20 @@ contract StakingRewards is ReentrancyGuard {
     require(_amount > 0, "Unstake amount should be positive");
     require(_totalSupply >= _amount, "Unstake amount exceeds totalSupply");
     require(_balances[msg.sender] >= _amount, "Unstake amount exceeds balance");
+
     _totalSupply -= _amount;
     _balances[msg.sender] -= _amount;
     stakingToken.transfer(msg.sender, _amount);
+
     emit Unstaked(msg.sender, _amount);
   }
 
   function getReward() external nonReentrant updateReward(msg.sender) {
-//    require(false, "---false--");
     uint reward = rewards[msg.sender];
-//    require(reward > 0, "---wtf--");
     if (reward > 0) {
-//      require(false, "---1--");
       rewards[msg.sender] = 0;
       rewardsToken.transfer(msg.sender, reward);
+
       emit Rewarded(msg.sender, reward);
     }
   }
